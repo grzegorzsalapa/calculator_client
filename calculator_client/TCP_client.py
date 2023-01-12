@@ -1,0 +1,24 @@
+import socket
+
+
+class CommunicationError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+HOST = '127.0.0.1'
+PORT = 9010
+fmt = 'c'
+
+
+def get_result(expression):
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((HOST, PORT))
+            expressionb = bytes(expression, 'utf-8')
+            s.sendall(expressionb)
+            resultb = s.recv(1024)
+            response = str(resultb)[2:][:-1]
+    except Exception as e:
+        raise CommunicationError(str(e))
+    return response
