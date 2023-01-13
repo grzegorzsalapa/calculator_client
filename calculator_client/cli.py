@@ -1,17 +1,27 @@
 from calculator_client import calculate, CalculationError
 
+
+def main():
+    expression = _input_from_initial_prompt()
+
+    try:
+        result = calculate(expression)
+    except CalculationError as e:
+        print("Calculation error: " + str(e), "\n")
+    else:
+        print(result, "\n")
+
+
+def _input_from_initial_prompt():
+    expression = input("Give me some simple equation and press enter,"
+                    " only integers allowed: \n")
+    return expression
+
+
 if __name__ == "__main__":
+    print("")
     try:
         while True:
-            exp_str = input("Give me some simple equation and press enter,"
-                            " only integers allowed: \n")  # Initial prompt for the user
-
-            try:
-                result = calculate(exp_str)
-            except CalculationError as e:
-                print("Calculation error: " + str(e))
-            else:
-                print(result, "\n")
-
+            main()
     except KeyboardInterrupt:
-        print("\rBye")
+        print("\rBye\n")
