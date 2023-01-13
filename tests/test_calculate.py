@@ -1,42 +1,22 @@
-from unittest.mock import Mock, patch
-from calculator_client.TCP_client import get_result, CommunicationError
+from unittest.mock import MagicMock, patch
 from calculator_client.calculate import calculate
-import socket
 
 
-def test_1(mocker):
-    def mock_recv(self, x):
-        return b'6'
+def _set_up_mocked_calculator_socket(recv_value=None):
+    socket_instance = MagicMock(name="SocketInstance")
+    socket_instance.recv = MagicMock(return_value=recv_value)
+
+    socket_context = MagicMock(name="SocketContext")
+    socket_context.__enter__ = MagicMock(return_value=socket_instance)
+
+    socket_mock = MagicMock()
+    socket_mock.socket = MagicMock(name="SocketModule", return_value=socket_context)
+
+    return socket_mock
 
 
-    mocker.patch('calculator_client.TCP_client.socket.socket')
-    mocker.patch('calculator_client.TCP_client.socket.socket.connect')
-    mocker.patch('calculator_client.TCP_client.socket.socket.sendall')
-    mocker.patch('calculator_client.TCP_client.socket.socket.recv', mock_recv)
+def test_that_received_result_on_socket_is_passed_properly_as_a_result_to_calculate():
+    socket_mock = _set_up_mocked_calculator_socket(recv_value=b'6')
 
-    assert calculate('2+2*2') == '6'
-
-#
-def test_2():
-    s = socket.socket()
-    s.connect = Mock()
-    s.sendall = Mock()
-    s.recv = Mock(return_value=b'6')
-
-    assert calculate('2+2*2') == '6'
-
-
-socket_mock = Mock()
-socket_mock.connect.return_value = None
-socket_mock.sendall.return_value = None
-socket_mock.recv().return_value = 0
-
-@patch('calculator_client.TCP_client.socket.socket')
-def test_3(socket_mock):
-    assert calculate('2+2*2') == '6'
-
-@patch('calculator_client.TCP_client.socket.socket')
-def test_4(socket_mock):
-    calculate('2+2*2')
-    assert socket_mock.sendall.assert_called()
-    assert socket_mock.sendall.assert_called_with(b'2+2*2')
+    with patch('calculator_client.TCP_client.socket', new=socket_mock):
+        assert calculate('2+2*2') == '6'
