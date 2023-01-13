@@ -19,8 +19,18 @@ def test_1(mocker):
 #
 def test_2():
     s = socket.socket()
-    # s.connect = Mock()
-    # s.sendall = Mock()
+    s.connect = Mock()
+    s.sendall = Mock()
     s.recv = Mock(return_value=b'6')
 
+    assert calculate('2+2*2') == '6'
+
+
+socket_mock = Mock()
+socket_mock.connect.return_value = None
+socket_mock.sendall.return_value = None
+socket_mock.recv.return_value = b'6'
+
+@patch('calculator_client.TCP_client.socket.socket')
+def test_3(socket_mock):
     assert calculate('2+2*2') == '6'
