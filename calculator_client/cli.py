@@ -2,26 +2,35 @@ from calculator_client import calculate, CalculationError
 
 
 def main():
-    expression = _input_from_initial_prompt()
-
     try:
-        result = calculate(expression)
-    except CalculationError as e:
-        print("Calculation error: " + str(e), "\n")
-    else:
-        print(result, "\n")
+        server_address = _ask_for_server_address()
+        while True:
+            expression = _ask_for_expression()
+
+            try:
+                result = calculate(expression, server_address)
+
+            except CalculationError as e:
+                print(str(e), "\n")
+
+            else:
+                print(result, "\n")
+
+    except KeyboardInterrupt:
+        print("\rBye")
 
 
-def _input_from_initial_prompt():
-    expression = input("Give me some simple equation and press enter,"
-                    " only integers allowed: \n")
+def _ask_for_server_address():
+    server_address = input("Provide calculation server address:\n")
+    print('')
+    return server_address
+
+
+def _ask_for_expression():
+    expression = input("Provide simple math expression and press enter, "
+                       "only integers allowed:\n")
     return expression
 
 
 if __name__ == "__main__":
-    print("")
-    try:
-        while True:
-            main()
-    except KeyboardInterrupt:
-        print("\rBye\n")
+    main()

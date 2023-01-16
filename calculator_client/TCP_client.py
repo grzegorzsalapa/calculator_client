@@ -11,10 +11,10 @@ PORT = 9010
 fmt = 'c'
 
 
-def get_result(expression):
+def get_result(expression: str, server_address: str):
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
+            s.connect((server_address, PORT))
             expressionb = bytes(expression, 'utf-8')
             s.sendall(expressionb)
             resultb = s.recv(1024)
