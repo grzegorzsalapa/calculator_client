@@ -6,9 +6,7 @@ class CommunicationError(Exception):
         self.message = message
 
 
-HOST = '127.0.0.1'
 PORT = 9010
-fmt = 'c'
 
 
 def get_result(expression: str, server_address: str):

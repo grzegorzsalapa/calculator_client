@@ -1,5 +1,6 @@
 from .TCP_client import get_result, CommunicationError
 
+
 class CalculationError(Exception):
     def __init__(self, message: str):
         self.message = message
@@ -7,7 +8,6 @@ class CalculationError(Exception):
 
 class RemoteCalculationError(Exception):
     pass
-
 
 
 def _check_if_error_returned(str_to_check):
@@ -32,4 +32,3 @@ def calculate(expression: str, server_address: str):
     except CommunicationError as e:
 
         raise CalculationError(str(e))
-
