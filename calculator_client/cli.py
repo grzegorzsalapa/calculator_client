@@ -1,14 +1,17 @@
-from calculator_client import calculate, CalculationError
+from calculator_client import RemoteCalculator, CalculationError
+
 
 
 def main():
     try:
         server_address = _ask_for_server_address()
+        rc = RemoteCalculator()
+        rc.connect(server_address)
         while True:
             expression = _ask_for_expression()
 
             try:
-                result = calculate(expression, server_address)
+                result = rc.calculate(expression)
 
             except CalculationError as e:
                 print(str(e), "\n")

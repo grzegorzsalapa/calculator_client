@@ -1,1 +1,1 @@
-from calculator_client.calculate import calculate, CalculationError
+from calculator_client.calculate import RemoteCalculator, CalculationError

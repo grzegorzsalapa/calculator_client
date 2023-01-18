@@ -8,15 +8,27 @@ class CommunicationError(Exception):
 
 PORT = 9010
 
-
-def get_result(expression: str, server_address: str):
+def connect_socket(server_address):
     try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((server_address, PORT))
-            expressionb = bytes(expression, 'utf-8')
-            s.sendall(expressionb)
-            resultb = s.recv(1024)
-            response = str(resultb)[2:][:-1]
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((server_address, PORT))
+
+        return s
+
     except Exception as e:
+        s.close()
         raise CommunicationError(str(e))
-    return response
+
+
+def get_result(expression: str, s):
+    try:
+        expressionb = bytes(expression, 'utf-8')
+        s.sendall(expressionb)
+        resultb = s.recv(1024)
+        response = str(resultb)[2:][:-1]
+
+        return response
+
+    except Exception as e:
+        s.close()
+        raise CommunicationError(str(e))

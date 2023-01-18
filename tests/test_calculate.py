@@ -38,7 +38,7 @@ def test_that_server_address_is_passed_to_socket():
 
     with patch('calculator_client.TCP_client.socket', new=socket_mock):
         calculate('2+2', '127.0.0.1')
-        socket_mock.socket().__enter__().connect.assert_called_once_with(('127.0.0.1', 9010))
+        socket_mock.socket().__enter__().connect_socket.assert_called_once_with(('127.0.0.1', 9010))
 
 
 def test_that_returned_error_message_is_converted_to_exception():
