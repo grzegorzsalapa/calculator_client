@@ -16,7 +16,7 @@ class RemoteCalculator:
         try:
             self.remote_service.connect()
 
-        except ConnectionRefusedError as e:
+        except ConnectionError as e:
             raise ConnectionError(str(e))
 
     def calculate(self, expression: str):
@@ -26,5 +26,5 @@ class RemoteCalculator:
         except RemoteCalculationError as e:
             raise CalculationError(str(e))
 
-        except ConnectionRefusedError or BrokenPipeError as e:
+        except ConnectionError as e:
             raise ConnectionError(str(e))

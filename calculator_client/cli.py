@@ -6,23 +6,26 @@ def main():
     try:
         server_address = _ask_for_server_address()
         rc = RemoteCalculator(server_address)
-        rc.connect()
         while True:
-            expression = _ask_for_expression()
-
             try:
-                result = rc.calculate(expression)
+                rc.connect()
+                while True:
+                    expression = _ask_for_expression()
 
-            except CalculationError as e:
+                    try:
+                        result = rc.calculate(expression)
+
+                    except CalculationError as e:
+                        print(str(e), "\n")
+
+                    else:
+                        print(result, "\n")
+
+            except ConnectionError as e:
                 print(str(e), "\n")
-
-            else:
-                print(result, "\n")
 
     except KeyboardInterrupt:
         print("\rBye")
-    except ConnectionError as e:
-        print(str(e), "\nClosing program.\n")
 
 
 def _ask_for_server_address():

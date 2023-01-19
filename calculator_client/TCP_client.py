@@ -12,7 +12,7 @@ class RemoteService:
         self.server_address = server_address
         self.PORT = 9010
         self.soc = None
-        self.timeout = 10
+        self.timeout = 5
 
     def connect(self):
         attempts = 0
@@ -21,22 +21,22 @@ class RemoteService:
         while True:
             try:
                 self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                print(f"    Connecting to remote calculator on {self.server_address}...\n")
                 self.soc.settimeout(self.timeout)
                 self.soc.connect((self.server_address, self.PORT))
-                print(f"    Successfully connected to remote calculator on {self.server_address}.\n")
+                print(f"\r    Successfully connected to remote calculator on {self.server_address}.\n")
                 break
 
             except ConnectionRefusedError as e:
                 self.soc.close()
                 attempts += 1
-                print("    Unable to connect to", self.server_address,
-                      f"in attempt no {attempts}/{attempts_max}.")
                 if attempts == attempts_max:
                     print('')
                     self.soc = None
-                    raise ConnectionRefusedError(str(e))
-                print("    Please wait...\n")
+                    raise ConnectionError(str(e))
+                #print("    Please wait...\n")
                 time.sleep(5)
+                print(str(e), "\n")
 
     def get_result(self, expression: str):
         expr = expression
