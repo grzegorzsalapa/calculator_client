@@ -1,12 +1,12 @@
-from calculator_client import RemoteCalculator, CalculationError
+from calculator_client import RemoteCalculator, CalculationError, CommunicationError
 
 
 
 def main():
     try:
         server_address = _ask_for_server_address()
-        rc = RemoteCalculator()
-        rc.connect(server_address)
+        rc = RemoteCalculator(server_address)
+        rc.connect()
         while True:
             expression = _ask_for_expression()
 
@@ -21,10 +21,12 @@ def main():
 
     except KeyboardInterrupt:
         print("\rBye")
+    except CommunicationError as e:
+        print(str(e), "\nClosing program.\n")
 
 
 def _ask_for_server_address():
-    server_address = input("Provide calculation server address:\n")
+    server_address = input("\nProvide calculation server address:\n")
     print('')
     return server_address
 

@@ -1,4 +1,5 @@
 import socket
+import time
 
 
 class CommunicationError(Exception):
@@ -9,18 +10,26 @@ class CommunicationError(Exception):
 PORT = 9010
 
 def connect_socket(server_address):
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((server_address, PORT))
+    attempt = 0
+    attempts_allowed = 3
+    while True:
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect((server_address, PORT))
 
-        return s
+            return s
 
-    except Exception as e:
-        s.close()
-        raise CommunicationError(str(e))
+        except ConnectionRefusedError as e:
+            s.close()
+            attempt += 1
+            print("Unable to connect to", server_address, f"| Attempt no {attempt}/{attempts_allowed}.\n")
+            if attempt == attempts_allowed:
+                raise ConnectionRefusedError(str(e))
+            time.sleep(5)
 
 
 def get_result(expression: str, s):
+
     try:
         expressionb = bytes(expression, 'utf-8')
         s.sendall(expressionb)
@@ -29,6 +38,6 @@ def get_result(expression: str, s):
 
         return response
 
-    except Exception as e:
+    except BrokenPipeError as e:
         s.close()
         raise CommunicationError(str(e))

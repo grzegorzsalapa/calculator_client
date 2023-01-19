@@ -12,14 +12,23 @@ class RemoteCalculationError(Exception):
 
 class RemoteCalculator():
 
-    def connect(self, server_address):
+    def __init__(self, server_address):
         self.server_address = server_address
-        self.connection = connect_socket(self.server_address)
+
+
+    def connect(self):
+        try:
+            self.connection = connect_socket(self.server_address)
+
+        except ConnectionRefusedError as e:
+
+            raise CommunicationError(str(e))
 
 
     def _check_if_error_returned(self, str_to_check):
         try:
             float(str_to_check)
+
         except Exception:
             error_message = str_to_check
             raise RemoteCalculationError(error_message)
@@ -38,4 +47,4 @@ class RemoteCalculator():
 
         except CommunicationError as e:
 
-            raise CalculationError(str(e))
+            raise CommunicationError(str(e))
