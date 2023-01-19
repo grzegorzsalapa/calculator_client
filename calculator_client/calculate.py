@@ -1,4 +1,4 @@
-from .TCP_client import get_result, connect_socket, CommunicationError
+from .TCP_client import RemoteService, CommunicationError
 
 
 class CalculationError(Exception):
@@ -10,20 +10,20 @@ class RemoteCalculationError(Exception):
     pass
 
 
-class RemoteCalculator():
+class RemoteCalculator:
 
     def __init__(self, server_address):
         self.server_address = server_address
-
+        self.remote_service = RemoteService(self.server_address)
+        self.connection = None
 
     def connect(self):
         try:
-            self.connection = connect_socket(self.server_address)
+            self.connection = self.remote_service.connect()
 
         except ConnectionRefusedError as e:
 
             raise CommunicationError(str(e))
-
 
     def _check_if_error_returned(self, str_to_check):
         try:
@@ -33,13 +33,12 @@ class RemoteCalculator():
             error_message = str_to_check
             raise RemoteCalculationError(error_message)
 
-
     def calculate(self, expression: str):
         try:
-            self.result = get_result(expression, self.connection)
-            self._check_if_error_returned(self.result)
+            result = self.remote_service.get_result(expression)
+            self._check_if_error_returned(result)
 
-            return self.result
+            return result
 
         except RemoteCalculationError as e:
 
