@@ -1,4 +1,4 @@
-from calculator_client import RemoteCalculator, CalculationError, CommunicationError
+from calculator_client import RemoteCalculator, CalculationError
 
 
 
@@ -21,7 +21,7 @@ def main():
 
     except KeyboardInterrupt:
         print("\rBye")
-    except CommunicationError as e:
+    except ConnectionError as e:
         print(str(e), "\nClosing program.\n")
 
 
