@@ -11,7 +11,7 @@ class RemoteService:
     def __init__(self, server_address: str):
         self.server_address = server_address
         self.PORT = 9010
-        self.soc = None
+        self.socket = None
         self.timeout = 20
 
     def calculate(self, expression: str):
@@ -23,11 +23,11 @@ class RemoteService:
         return result
 
     def disconnect(self):
-        self.soc.close()
-        self.soc = None
+        self.socket.close()
+        self.socket = None
 
     def _connect_if_not_yet(self):
-        if self.soc is None:
+        if self.socket is None:
             self._connect()
 
     def _connect(self):
@@ -49,10 +49,10 @@ class RemoteService:
 
     def _connect_on_socket(self):
         try:
-            self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             print(f"    Connecting to remote calculator on {self.server_address}")
-            self.soc.settimeout(self.timeout)
-            self.soc.connect((self.server_address, self.PORT))
+            self.socket.settimeout(self.timeout)
+            self.socket.connect((self.server_address, self.PORT))
             print(f"\r    Successfully connected to remote calculator.")
 
         except ConnectionRefusedError as e:
@@ -64,8 +64,8 @@ class RemoteService:
         self._connect_if_not_yet()
         try:
             expr_b = bytes(expression, 'utf-8')
-            self.soc.sendall(expr_b)
-            result_b = self.soc.recv(1024)
+            self.socket.sendall(expr_b)
+            result_b = self.socket.recv(1024)
             while not result_b:
                 raise BrokenPipeError
             response = str(result_b)[2:][:-1]

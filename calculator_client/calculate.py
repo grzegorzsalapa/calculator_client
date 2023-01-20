@@ -2,6 +2,7 @@ from .TCP_client import RemoteService, RemoteCalculationError
 
 
 class CalculationError(Exception):
+
     def __init__(self, message: str):
         self.message = message
 
