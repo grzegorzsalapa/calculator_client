@@ -13,6 +13,7 @@ class RemoteService:
         self.PORT = 9010
         self.socket = None
         self.timeout = 20
+        self.sleep_time = 5
 
     def calculate(self, expression: str):
         expr = expression
@@ -42,7 +43,7 @@ class RemoteService:
 
             except ConnectionRefusedError:
                 count += 1
-                time.sleep(5)
+                time.sleep(self.sleep_time)
                 if count > limit:
                     raise TimeoutError("Several attempts to access the remote calculator failed.\n"
                                        "Try again...")

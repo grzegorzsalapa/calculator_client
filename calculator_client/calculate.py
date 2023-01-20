@@ -7,7 +7,7 @@ class CalculationError(Exception):
         self.message = message
 
 
-class RemoteCalculator:
+class Calculator:
 
     def __init__(self, server_address):
         self.server_address = server_address
