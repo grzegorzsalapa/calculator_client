@@ -3,28 +3,23 @@ from calculator_client import RemoteCalculator, CalculationError
 
 
 def main():
+    server_address = _ask_for_server_address()
+    rc = RemoteCalculator(server_address)
     try:
-        server_address = _ask_for_server_address()
-        rc = RemoteCalculator(server_address)
         while True:
+            expression = _ask_for_expression()
+
             try:
-                rc.connect()
-                while True:
-                    expression = _ask_for_expression()
+                result = rc.calculate(expression)
 
-                    try:
-                        result = rc.calculate(expression)
-
-                    except CalculationError as e:
-                        print(str(e), "\n")
-
-                    else:
-                        print(result, "\n")
-
-            except ConnectionError as e:
+            except CalculationError as e:
                 print(str(e), "\n")
 
+            else:
+                print(result, "\n")
+
     except KeyboardInterrupt:
+        rc.close()
         print("\rBye")
 
 

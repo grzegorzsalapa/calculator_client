@@ -12,13 +12,6 @@ class RemoteCalculator:
         self.server_address = server_address
         self.remote_service = RemoteService(self.server_address)
 
-    def connect(self):
-        try:
-            self.remote_service.connect()
-
-        except ConnectionError as e:
-            raise ConnectionError(str(e))
-
     def calculate(self, expression: str):
         try:
             return self.remote_service.get_result(expression)
@@ -26,5 +19,5 @@ class RemoteCalculator:
         except RemoteCalculationError as e:
             raise CalculationError(str(e))
 
-        except ConnectionError as e:
-            raise ConnectionError(str(e))
+    def close(self):
+        self.remote_service.disconnect()
