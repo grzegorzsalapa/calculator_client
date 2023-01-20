@@ -4,13 +4,13 @@ from calculator_client import RemoteCalculator, CalculationError
 
 def main():
     server_address = _ask_for_server_address()
-    rc = RemoteCalculator(server_address)
+    remote_calculator = RemoteCalculator(server_address)
     try:
         while True:
             expression = _ask_for_expression()
 
             try:
-                result = rc.calculate(expression)
+                result = remote_calculator.calculate(expression)
 
             except CalculationError as e:
                 print(str(e), "\n")
@@ -19,7 +19,7 @@ def main():
                 print(result, "\n")
 
     except KeyboardInterrupt:
-        rc.close()
+        remote_calculator.close()
         print("\rBye")
 
 

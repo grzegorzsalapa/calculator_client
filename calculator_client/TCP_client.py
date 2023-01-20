@@ -14,28 +14,21 @@ class RemoteService:
         self.soc = None
         self.timeout = 20
 
-    def get_result(self, expression: str):
+    def calculate(self, expression: str):
         expr = expression
-
-        if self.soc == None:
-            self._connect()
-
         while True:
-            try:
-                expr_b = bytes(expr, 'utf-8')
-                self.soc.sendall(expr_b)
-                result_b = self.soc.recv(1024)
-                while not result_b:
-                    raise BrokenPipeError
-                response = str(result_b)[2:][:-1]
-                _check_if_error_returned(response)
+            result = self._get_result(expr)
+            if result is not None:
+                break
+        return result
 
-                return response
+    def disconnect(self):
+        self.soc.close()
+        self.soc = None
 
-            except BrokenPipeError:
-                print("\n    Connection lost. Attempting to reconnect.\n")
-                self.disconnect()
-                self._connect()
+    def _connect_if_not_yet(self):
+        if self.soc is None:
+            self._connect()
 
     def _connect(self):
         count = 0
@@ -43,25 +36,46 @@ class RemoteService:
 
         while True:
             try:
-                self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                print(f"    Connecting to remote calculator on {self.server_address}")
-                self.soc.settimeout(self.timeout)
-                self.soc.connect((self.server_address, self.PORT))
+                self._connect_on_socket()
                 count = 0
-                print(f"\r    Successfully connected to remote calculator on {self.server_address}.\n")
                 break
 
-            except ConnectionRefusedError as e:
+            except ConnectionRefusedError:
                 count += 1
-                self.disconnect()
                 time.sleep(5)
-                print("   ", str(e), "\n")
                 if count > limit:
-                    raise TimeoutError
+                    raise TimeoutError("Several attempts to access the remote calculator failed.\n"
+                                       "Try again...")
 
-    def disconnect(self):
-        self.soc.close()
-        self.soc = None
+    def _connect_on_socket(self):
+        try:
+            self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            print(f"    Connecting to remote calculator on {self.server_address}")
+            self.soc.settimeout(self.timeout)
+            self.soc.connect((self.server_address, self.PORT))
+            print(f"\r    Successfully connected to remote calculator.")
+
+        except ConnectionRefusedError as e:
+            self.disconnect()
+            print("   ", str(e), "\n")
+            raise
+
+    def _get_result(self, expression):
+        self._connect_if_not_yet()
+        try:
+            expr_b = bytes(expression, 'utf-8')
+            self.soc.sendall(expr_b)
+            result_b = self.soc.recv(1024)
+            while not result_b:
+                raise BrokenPipeError
+            response = str(result_b)[2:][:-1]
+            _check_if_error_returned(response)
+
+            return response
+
+        except BrokenPipeError:
+            print("\n    Connection lost.\n")
+            self.disconnect()
 
 
 def _check_if_error_returned(str_to_check):

@@ -14,9 +14,12 @@ class RemoteCalculator:
 
     def calculate(self, expression: str):
         try:
-            return self.remote_service.get_result(expression)
+            return self.remote_service.calculate(expression)
 
         except RemoteCalculationError as e:
+            raise CalculationError(str(e))
+
+        except TimeoutError as e:
             raise CalculationError(str(e))
 
     def close(self):
