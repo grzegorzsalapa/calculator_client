@@ -24,8 +24,9 @@ class RemoteService:
         return result
 
     def disconnect(self):
-        self.socket.close()
-        self.socket = None
+        if self.socket is not None:
+            self.socket.close()
+            self.socket = None
 
     def _connect_if_not_yet(self):
         if self.socket is None:
@@ -74,7 +75,7 @@ class RemoteService:
 
             return response
 
-        except BrokenPipeError:
+        except (BrokenPipeError, ConnectionResetError):
             print("\n    Connection lost.\n")
             self.disconnect()
 
