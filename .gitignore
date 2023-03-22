@@ -1,5 +1,4 @@
 venv_clnt
 .idea
+.pytest_cache
 __pycache__
-pyproject.toml
-LICENSE
