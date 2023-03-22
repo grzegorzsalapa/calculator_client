@@ -1,14 +1,16 @@
-from calculator_client import calculate, CalculationError
+from calculator_client import Calculator, CalculationError
+
 
 
 def main():
+    server_address = _ask_for_server_address()
+    calculator = Calculator(server_address)
     try:
-        server_address = _ask_for_server_address()
         while True:
             expression = _ask_for_expression()
 
             try:
-                result = calculate(expression, server_address)
+                result = calculator.calculate(expression)
 
             except CalculationError as e:
                 print(str(e), "\n")
@@ -17,11 +19,12 @@ def main():
                 print(result, "\n")
 
     except KeyboardInterrupt:
+        calculator.close()
         print("\rBye")
 
 
 def _ask_for_server_address():
-    server_address = input("Provide calculation server address:\n")
+    server_address = input("\nProvide calculation server address:\n")
     print('')
     return server_address
 

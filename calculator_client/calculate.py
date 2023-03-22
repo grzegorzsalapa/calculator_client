@@ -1,34 +1,27 @@
-from .TCP_client import get_result, CommunicationError
+from .TCP_client import RemoteService, RemoteCalculationError
 
 
 class CalculationError(Exception):
+
     def __init__(self, message: str):
         self.message = message
 
 
-class RemoteCalculationError(Exception):
-    pass
+class Calculator:
 
+    def __init__(self, server_address):
+        self.server_address = server_address
+        self.remote_service = RemoteService(self.server_address)
 
-def _check_if_error_returned(str_to_check):
-    try:
-        float(str_to_check)
-    except Exception:
-        error_message = str_to_check
-        raise RemoteCalculationError(error_message)
+    def calculate(self, expression: str):
+        try:
+            return self.remote_service.calculate(expression)
 
+        except RemoteCalculationError as e:
+            raise CalculationError(str(e))
 
-def calculate(expression: str, server_address: str):
-    try:
-        result = get_result(expression, server_address)
-        _check_if_error_returned(result)
+        except TimeoutError as e:
+            raise CalculationError(str(e))
 
-        return result
-
-    except RemoteCalculationError as e:
-
-        raise CalculationError(str(e))
-
-    except CommunicationError as e:
-
-        raise CalculationError(str(e))
+    def close(self):
+        self.remote_service.disconnect()
